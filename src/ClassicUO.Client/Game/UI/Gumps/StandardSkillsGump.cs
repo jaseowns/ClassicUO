@@ -44,6 +44,7 @@ using ClassicUO.Renderer;
 using ClassicUO.Resources;
 using Microsoft.Xna.Framework;
 using SDL2;
+using ClassicUO.Utility.Platforms;
 
 namespace ClassicUO.Game.UI.Gumps
 {
@@ -95,7 +96,8 @@ namespace ClassicUO.Game.UI.Gumps
                 _scrollArea.Width - 14,
                 _scrollArea.Height - (83 + _diffY),
                 false
-            ) { AcceptMouseInput = true, CanMove = true };
+            )
+            { AcceptMouseInput = true, CanMove = true };
 
             Add(_area);
 
@@ -115,7 +117,8 @@ namespace ClassicUO.Game.UI.Gumps
                     600,
                     0,
                     3
-                ) { X = _bottomComment.X + _bottomComment.Width + 5, Y = _bottomComment.Y - 5 }
+                )
+                { X = _bottomComment.X + _bottomComment.Width + 5, Y = _bottomComment.Y - 5 }
             );
 
             //new group
@@ -142,7 +145,8 @@ namespace ClassicUO.Game.UI.Gumps
                     1,
                     0x0386,
                     false
-                ) { X = _newGroupButton.X + _newGroupButton.Width + 30, Y = _newGroupButton.Y - 6 }
+                )
+                { X = _newGroupButton.X + _newGroupButton.Width + 30, Y = _newGroupButton.Y - 6 }
             );
 
             Add
@@ -155,7 +159,8 @@ namespace ClassicUO.Game.UI.Gumps
                     1,
                     0x0386,
                     false
-                ) { X = _newGroupButton.X + _newGroupButton.Width + 30, Y = _newGroupButton.Y + 7 }
+                )
+                { X = _newGroupButton.X + _newGroupButton.Width + 30, Y = _newGroupButton.Y + 7 }
             );
 
             _checkReal.ValueChanged += UpdateSkillsValues;
@@ -192,7 +197,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     _isMinimized = value;
 
-                    _gumpPic.Graphic = value ? (ushort) 0x839 : (ushort) 0x82D;
+                    _gumpPic.Graphic = value ? (ushort)0x839 : (ushort)0x82D;
 
                     if (value)
                     {
@@ -345,7 +350,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         private void UpdateSkillsValues(object sender, EventArgs e)
         {
-            Checkbox checkbox = (Checkbox) sender;
+            Checkbox checkbox = (Checkbox)sender;
 
             if (_checkReal.IsChecked && _checkCaps.IsChecked)
             {
@@ -527,7 +532,7 @@ namespace ClassicUO.Game.UI.Gumps
                 get => _isMinimized;
                 set
                 {
-                    ushort graphic = (ushort) (value ? 0x0827 : 0x826);
+                    ushort graphic = (ushort)(value ? 0x0827 : 0x826);
 
                     _button.ButtonGraphicNormal = graphic;
                     _button.ButtonGraphicOver = graphic;
@@ -598,14 +603,14 @@ namespace ClassicUO.Game.UI.Gumps
                                     .Parent // skillgruop
                         != this)
                     {
-                        SkillsGroupControl originalGroup = (SkillsGroupControl) skillControl.Parent.Parent;
+                        SkillsGroupControl originalGroup = (SkillsGroupControl)skillControl.Parent.Parent;
 
                         if (originalGroup != null)
                         {
                             // remove from original control the skillcontrol
-                            if (!_group.Contains((byte) skillControl.Index))
+                            if (!_group.Contains((byte)skillControl.Index))
                             {
-                                byte index = (byte) skillControl.Index;
+                                byte index = (byte)skillControl.Index;
 
                                 originalGroup._skills.Remove(skillControl);
 
@@ -688,7 +693,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                         while (_box.Children.Count != 0)
                         {
-                            SkillItemControl skillControl = (SkillItemControl) _box.Children[0];
+                            SkillItemControl skillControl = (SkillItemControl)_box.Children[0];
 
                             int itemCount = first._group.Count;
 
@@ -804,6 +809,8 @@ namespace ClassicUO.Game.UI.Gumps
 
                 if (skill != null)
                 {
+
+
                     if (skill.IsClickable)
                     {
                         Button buttonUse = new Button(0, 0x0837, 0x0838, 0x0838)
@@ -828,9 +835,18 @@ namespace ClassicUO.Game.UI.Gumps
 
                     Add(_buttonStatus);
 
+                    Button buttonWiki = new Button(3, 0x5689, 0x568A, 0x568B)
+                    {
+                        ButtonAction = ButtonAction.Activate,
+                        X = 22,
+                        Width = 10,
+                        Height = 10
+                    };
+                    Add(buttonWiki);
+
                     Label name;
                     Add(name = new Label(skill.Name, false, 0x0288, font: 9));
-                    name.X = 22;
+                    name.X = 36;
 
                     Add(_value = new Label("", false, 0x0288, font: 9));
 
@@ -868,7 +884,7 @@ namespace ClassicUO.Game.UI.Gumps
                     }
 
                     Skill skill = _gump.World.Player.Skills[Index];
-                    byte newStatus = (byte) skill.Lock;
+                    byte newStatus = (byte)skill.Lock;
 
                     if (newStatus < 2)
                     {
@@ -881,8 +897,18 @@ namespace ClassicUO.Game.UI.Gumps
 
                     NetClient.Socket.Send_SkillStatusChangeRequest((ushort)Index, newStatus);
 
-                    skill.Lock = (Lock) newStatus;
-                    SetStatus((Lock) newStatus);
+                    skill.Lock = (Lock)newStatus;
+                    SetStatus((Lock)newStatus);
+                }
+                else if (buttonID == 3) // load wiki
+                {
+                    Skill skill = _gump.World.Player.Skills[Index];
+                    // jaseowns: This web link might need to live somewhere else, but this worked? :D
+                    WebLink link = new WebLink()
+                    {
+                        Link = "https://wiki.uooutlands.com/" + skill.Name
+                    };
+                    PlatformHelper.LaunchBrowser(link.Link);
                 }
             }
 
@@ -922,6 +948,8 @@ namespace ClassicUO.Game.UI.Gumps
                     _value.X = 250 - _value.Width;
                 }
             }
+
+
 
             private ushort GetStatusButtonGraphic()
             {
@@ -970,6 +998,11 @@ namespace ClassicUO.Game.UI.Gumps
                 }
 
                 return null;
+            }
+
+            protected override void OnMouseEnter(int x, int y)
+            {
+
             }
 
             protected override void OnMouseDown(int x, int y, MouseButtonType button)

@@ -41,6 +41,8 @@ using ClassicUO.Assets;
 using ClassicUO.Renderer;
 using ClassicUO.Resources;
 using Microsoft.Xna.Framework;
+using ClassicUO.Utility.Platforms;
+using System;
 
 namespace ClassicUO.Game.UI.Gumps
 {
@@ -104,7 +106,7 @@ namespace ClassicUO.Game.UI.Gumps
             area.Add(_databox);
 
             Add(
-                new NiceButton(10, 10, 180, 25, ButtonAction.Activate, ResGumps.Name)
+                new NiceButton(10, 10, 200, 25, ButtonAction.Activate, ResGumps.Name)
                 {
                     ButtonParameter = (int)Buttons.SortName,
                     IsSelected = true,
@@ -114,10 +116,10 @@ namespace ClassicUO.Game.UI.Gumps
             );
 
             Add(
-                new NiceButton(10, 10, 80, 25, ButtonAction.Activate, ResGumps.Real)
+                new NiceButton(10, 10, 60, 25, ButtonAction.Activate, ResGumps.Real)
                 {
                     ButtonParameter = (int)Buttons.SortReal,
-                    X = 220,
+                    X = 240,
                     Y = 25
                 }
             );
@@ -299,7 +301,18 @@ namespace ClassicUO.Game.UI.Gumps
             Label skillCap = skillcap;
 
             _skill = skill;
-            skillName.X = 20;
+
+            Button buttonWiki = new Button((int)Buttons.Wiki, 0x5689, 0x568A, 0x568B)
+            {
+                ButtonAction = ButtonAction.Activate,
+                X = 18,
+                Y = 4,
+                Width = 10,
+                Height = 10
+            };
+            Add(buttonWiki);
+
+            skillName.X = 30;
 
             if (skill.IsClickable)
             {
@@ -313,8 +326,9 @@ namespace ClassicUO.Game.UI.Gumps
                 );
             }
 
+
             Add(skillName);
-            skillValueBase.X = 200;
+            skillValueBase.X = 220;
 
             Add(skillValueBase);
             skillValue.X = 280;
@@ -408,12 +422,17 @@ namespace ClassicUO.Game.UI.Gumps
                     GameActions.UseSkill(_skill.Index);
 
                     break;
+                case Buttons.Wiki:
+                    // jaseowns: This web link might need to live somewhere else, but this worked? :D
+                    PlatformHelper.LaunchBrowser("https://wiki.uooutlands.com/" + _skill.Name);
+                    break;
             }
         }
 
         private enum Buttons
         {
-            ActiveSkillUse = 1
+            ActiveSkillUse = 1,
+            Wiki = 3,
         }
     }
 }
